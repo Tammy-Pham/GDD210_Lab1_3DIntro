@@ -24,7 +24,7 @@ public class Rocket : MonoBehaviour
 			EngineOn = false;
 		}
 
-		VelocityText.text = (Mathf.Round(RocketRB.velocity.y * 100f)/100f).ToString();
+		VelocityText.text = (Mathf.Round(RocketRB.linearVelocity.y * 100f)/100f).ToString();
 	}
 
 	private void FixedUpdate()
