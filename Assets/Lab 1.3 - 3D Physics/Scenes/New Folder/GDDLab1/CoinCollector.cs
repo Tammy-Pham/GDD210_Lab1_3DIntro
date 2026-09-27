@@ -2,10 +2,14 @@ using UnityEngine;
 
 public class CoinCollector : MonoBehaviour
 {
-    public GameObject player;
-    public GameObject coin;
 
-    private void OnCollisionEnter(Collision collision)
+    public void Collect()
+    {
+        Debug.Log("Collected");
+        Destroy(gameObject);
+    }
+
+    /*private void OnCollisionEnter(Collision collision)
     {
         PlayerScript playerscript = collision.gameObject.GetComponent<PlayerScript>();
         if(collision.gameObject.GetComponent<PlayerScript>())
@@ -13,5 +17,5 @@ public class CoinCollector : MonoBehaviour
             Destroy(coin);
             playerscript.amountCoin += 1;
         }
-    }
+    }*/
 }

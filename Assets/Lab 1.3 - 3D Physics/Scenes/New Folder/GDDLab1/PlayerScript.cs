@@ -1,75 +1,60 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+
 public class PlayerScript : MonoBehaviour
 {
-    [SerializeField] private float MoveSpeed;
-    [SerializeField] private Rigidbody Rb;
-    public float amountCoin;
-    public float JumpForce;
-    private int jumps;
-    private bool jump;
-    public GameObject players;
-    private float inputx;
-    private float inputz;
-    public Image winImage;
-    public TMP_Text winningtext;
-    public GameObject restart;
 
-    // Update is called once per frame
+    public float amountCoin;
+    public Transform CamTransform;
+    public float MouseSensitvity;
+    private float camRotation = 0f;
+
+    private void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     private void Update()
     {
-        //movement
-        float inputx = Input.GetAxis("Horizontal");
-        float inputz = -Input.GetAxis("Vertical");
+        float mouseInputY = Input.GetAxis("Mouse Y") * MouseSensitvity * Time.deltaTime;
+        camRotation -= mouseInputY;
+        camRotation = Mathf.Clamp(camRotation, -90f, 90f);
+        CamTransform.localRotation = Quaternion.Euler(camRotation, 0f, 0f);
 
+        float mouseInputx = Input.GetAxis("Mouse X") * MouseSensitvity * Time.deltaTime;
+        transform.rotation = Quaternion.Euler(transform.eulerAngles + new Vector3(0f, mouseInputx));
 
-        if (Input.GetKey(KeyCode.Space) && jumps > 0)
-        {
-            jumps -= 1;
-            jump = true;
-            //helps the player stay upright(most of the time)
-            players.transform.rotation = Quaternion.identity;
-        }
-
-        //controlbutton 
-        transform.position += Vector3.forward * inputx * MoveSpeed * Time.deltaTime;
-        transform.position += Vector3.right * inputz * MoveSpeed * Time.deltaTime;
-
-        //have rotation follow based on the rotation 
-
-        if(amountCoin == 7)
+        if (amountCoin == 8)
         {
             Debug.Log("you win");
-            winImage.enabled = true;
-            winningtext.enabled = true;
-            winningtext.text = "you win";
-            restart.SetActive(true);
-            Rb.isKinematic = true;
+        }
 
-        }
-        else
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            winImage.enabled = false;
-            winningtext.enabled = false;
-            restart.SetActive(false);
+            RayCasting();
         }
-        
+
+       
     }
 
-    private void FixedUpdate()
+    private void RayCasting()
     {
-        if(jump == true)
+        RaycastHit hit;
+        if(Physics.Raycast(CamTransform.position, CamTransform.forward,out hit))
         {
-            Rb.linearVelocity = new Vector3(Rb.linearVelocity.x, JumpForce, Rb.linearVelocity.z);
-            jump = false;
+            Debug.DrawLine(CamTransform.position + new Vector3(0f, -1f, 0f), hit.point, Color.green, 5f);
+            CoinCollector hitCoin = hit.collider.gameObject.GetComponent<CoinCollector>();
+
+            Debug.Log(hit.collider.gameObject.name);
+            if (hitCoin != null)
+            {
+                Debug.Log("hit Coin!");
+                hitCoin.Collect();
+            }
+            else
+            {
+                Debug.Log("not hit coin");
+            }
         }
-
-        Rb.linearVelocity = (Vector3.right * inputx * MoveSpeed) + (Vector3.forward * inputz * MoveSpeed);
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        jumps = 2;
     }
 }
